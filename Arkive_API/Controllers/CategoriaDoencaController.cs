@@ -1,6 +1,7 @@
 ﻿using Arkive_API.Data;
-using Microsoft.AspNetCore.Http;
+using Arkive_API.Models;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace Arkive_API.Controllers
 {
@@ -15,5 +16,120 @@ namespace Arkive_API.Controllers
             _context = context;
         }
 
+        [HttpGet]
+        [SwaggerOperation(
+            Summary = "Lista todas as categorias de doença",
+            Description = "Retorna todas as categorias clínicas cadastradas no sistema."
+        )]
+        public IActionResult GetAllCategorias()
+        {
+            try
+            {
+                var resultado = _context.CategoriaDoenca.ToList();
+
+                if (!resultado.Any())
+                    return NoContent();
+
+                return Ok(resultado);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("{id}")]
+        [SwaggerOperation(
+            Summary = "Busca categoria de doença por ID",
+            Description = "Retorna uma categoria clínica específica pelo seu ID."
+        )]
+        public IActionResult GetCategoriaById(int id)
+        {
+            try
+            {
+                var categoria = _context.CategoriaDoenca.FirstOrDefault(x => x.Id == id);
+
+                if (categoria is null)
+                    return NotFound();
+
+                return Ok(categoria);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost]
+        [SwaggerOperation(
+            Summary = "Cria uma nova categoria de doença",
+            Description = "Cadastra uma nova categoria clínica no sistema."
+        )]
+        public IActionResult CreateCategoria(CategoriaDoencaEntity model)
+        {
+            try
+            {
+                _context.CategoriaDoenca.Add(model);
+                _context.SaveChanges();
+
+                return CreatedAtAction(nameof(GetCategoriaById), new { id = model.Id }, model);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPut("{id}")]
+        [SwaggerOperation(
+            Summary = "Atualiza uma categoria de doença",
+            Description = "Atualiza os dados de uma categoria clínica existente."
+        )]
+        public IActionResult CategoriaUpdate(int id, CategoriaDoencaEntity model)
+        {
+            try
+            {
+                var categoria = _context.CategoriaDoenca.FirstOrDefault(x => x.Id == id);
+
+                if (categoria is null)
+                    return NotFound();
+
+                categoria.Nome = model.Nome;
+
+                _context.CategoriaDoenca.Update(categoria);
+                _context.SaveChanges();
+
+                return Ok(categoria);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpDelete("{id}")]
+        [SwaggerOperation(
+            Summary = "Remove uma categoria de doença",
+            Description = "Remove uma categoria clínica do sistema."
+        )]
+        public IActionResult CategoriaDelete(int id)
+        {
+            try
+            {
+                var categoria = _context.CategoriaDoenca.FirstOrDefault(x => x.Id == id);
+
+                if (categoria is null)
+                    return NotFound();
+
+                _context.CategoriaDoenca.Remove(categoria);
+                _context.SaveChanges();
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

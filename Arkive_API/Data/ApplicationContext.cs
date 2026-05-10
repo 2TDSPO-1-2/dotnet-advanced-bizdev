@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Arkive_API.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Arkive_API.Data
 {
@@ -9,5 +10,11 @@ namespace Arkive_API.Data
 
         }
 
+        public DbSet<CategoriaDoencaEntity> CategoriaDoenca { get; set; }
+        public DbSet<DoencaEntity> Doenca { get; set; }
+        public DbSet<EspecieEntity> Especie { get; set; }
+        public DbSet<FeedbackNPSEntity> FeedbackNPS { get; set; }
+        public DbSet<PredisposicaoEntity> Predisposicao { get; set; }
+        public DbSet<RacaEntity> Raca { get; set; }
     }
 }

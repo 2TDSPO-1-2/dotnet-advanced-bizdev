@@ -1,4 +1,5 @@
 ﻿using Arkive_API.Models;
+using Arkive_API.Models.External;
 using Microsoft.EntityFrameworkCore;
 
 namespace Arkive_API.Data
@@ -16,5 +17,11 @@ namespace Arkive_API.Data
         public DbSet<FeedbackNPSEntity> FeedbackNPS { get; set; }
         public DbSet<PredisposicaoEntity> Predisposicao { get; set; }
         public DbSet<RacaEntity> Raca { get; set; }
+
+        // Classes externas trabalhadas na API Java, usadas para consulta/validação
+        public DbSet<ResponsavelExternal> Responsavel { get; set; }
+        public DbSet<AnimalExternal> Animal { get; set; }
+        public DbSet<ClinicaExternal> Clinica { get; set; }
+        public DbSet<ConsultaExternal> Consulta { get; set; }
     }
 }

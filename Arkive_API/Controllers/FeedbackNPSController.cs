@@ -186,12 +186,34 @@ namespace Arkive_API.Controllers
         [HttpPost]
         [SwaggerOperation(
             Summary = "Registra um novo feedback NPS",
-            Description = "Registra um feedback de satisfação vinculado a responsável, animal, clínica ou consulta."
+            Description = "Registra um feedback de satisfação vinculado a ao menos um contexto: responsável, animal, clínica ou consulta."
         )]
         public IActionResult CreateFeedback(FeedbackNPSEntity model)
         {
             try
             {
+                // Espelha CK_ARKIVE_NPS_CONTEXTO: ao menos um contexto é obrigatório
+                if (model.IdResponsavel is null && model.IdAnimal is null &&
+                    model.IdClinica is null && model.IdConsulta is null)
+                    return BadRequest("Informe ao menos um contexto: responsável, animal, clínica ou consulta.");
+
+                // Valida existência dos IDs externos (tabelas gerenciadas pela API Java)
+                if (model.IdResponsavel is not null &&
+                    !_context.Responsavel.Any(x => x.Id == model.IdResponsavel))
+                    return NotFound($"Responsável com ID {model.IdResponsavel} não encontrado.");
+
+                if (model.IdAnimal is not null &&
+                    !_context.Animal.Any(x => x.Id == model.IdAnimal))
+                    return NotFound($"Animal com ID {model.IdAnimal} não encontrado.");
+
+                if (model.IdClinica is not null &&
+                    !_context.Clinica.Any(x => x.Id == model.IdClinica))
+                    return NotFound($"Clínica com ID {model.IdClinica} não encontrada.");
+
+                if (model.IdConsulta is not null &&
+                    !_context.Consulta.Any(x => x.Id == model.IdConsulta))
+                    return NotFound($"Consulta com ID {model.IdConsulta} não encontrada.");
+
                 _context.FeedbackNPS.Add(model);
                 _context.SaveChanges();
 

@@ -29,5 +29,9 @@ namespace Arkive_API.Models
         [Column("TP_PORTE")]
         [RegularExpression("Pequeno|Médio|Grande", ErrorMessage = "Tamanho/Porte inválido.")]
         public string? Porte { get; set; }
+
+        [Column("ST_ATIVO")]
+        [Required]
+        public char StAtivo { get; set; } = 'S';
     }
 }

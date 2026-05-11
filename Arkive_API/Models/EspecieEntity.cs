@@ -17,5 +17,9 @@ namespace Arkive_API.Models
         [Column("NM_ESPECIE")]
         [StringLength(50, ErrorMessage = "O nome da Espécie deve ter no máximo 50 caracteres.")]
         public string Especie { get; set; }
+
+        [Column("ST_ATIVO")]
+        [Required]
+        public char StAtivo { get; set; } = 'S';
     }
 }

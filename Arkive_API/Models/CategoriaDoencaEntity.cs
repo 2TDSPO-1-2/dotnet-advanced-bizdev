@@ -16,5 +16,9 @@ namespace Arkive_API.Models
         [StringLength(100, MinimumLength = 1, ErrorMessage = "O nome da Categoria deve ter no máximo 100 caracteres.")]
         [Column("NM_CATEGORIA")]
         public string Nome { get; set; }
+
+        [Column("ST_ATIVO")]
+        [Required]
+        public char StAtivo { get; set; } = 'S';
     }
 }

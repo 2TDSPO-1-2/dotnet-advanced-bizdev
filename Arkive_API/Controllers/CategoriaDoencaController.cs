@@ -38,6 +38,54 @@ namespace Arkive_API.Controllers
             }
         }
 
+        [HttpGet("ativos")]
+        [SwaggerOperation(
+            Summary = "Lista categorias de doença ativas",
+            Description = "Retorna todas as categorias clínicas com status ativo."
+        )]
+        public IActionResult GetCategoriasAtivas()
+        {
+            try
+            {
+                var resultado = _context.CategoriaDoenca
+                    .Where(x => x.StAtivo == 'S')
+                    .ToList();
+
+                if (!resultado.Any())
+                    return NoContent();
+
+                return Ok(resultado);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("inativos")]
+        [SwaggerOperation(
+            Summary = "Lista categorias de doença inativas",
+            Description = "Retorna todas as categorias clínicas com status inativo (excluídas logicamente)."
+        )]
+        public IActionResult GetCategoriasInativas()
+        {
+            try
+            {
+                var resultado = _context.CategoriaDoenca
+                    .Where(x => x.StAtivo == 'N')
+                    .ToList();
+
+                if (!resultado.Any())
+                    return NoContent();
+
+                return Ok(resultado);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         [HttpGet("{id}")]
         [SwaggerOperation(
             Summary = "Busca categoria de doença por ID",
@@ -47,7 +95,9 @@ namespace Arkive_API.Controllers
         {
             try
             {
-                var categoria = _context.CategoriaDoenca.FirstOrDefault(x => x.Id == id);
+                var categoria = _context.CategoriaDoenca
+                    .Where(x => x.StAtivo == 'S')
+                    .FirstOrDefault(x => x.Id == id);
 
                 if (categoria is null)
                     return NotFound();
@@ -69,6 +119,8 @@ namespace Arkive_API.Controllers
         {
             try
             {
+                model.StAtivo = 'S';
+
                 _context.CategoriaDoenca.Add(model);
                 _context.SaveChanges();
 
@@ -89,7 +141,9 @@ namespace Arkive_API.Controllers
         {
             try
             {
-                var categoria = _context.CategoriaDoenca.FirstOrDefault(x => x.Id == id);
+                var categoria = _context.CategoriaDoenca
+                    .Where(x => x.StAtivo == 'S')
+                    .FirstOrDefault(x => x.Id == id);
 
                 if (categoria is null)
                     return NotFound();
@@ -107,21 +161,54 @@ namespace Arkive_API.Controllers
             }
         }
 
+        [HttpPut("reativar/{id}")]
+        [SwaggerOperation(
+            Summary = "Reativa uma categoria de doença",
+            Description = "Restaura uma categoria clínica previamente inativada."
+        )]
+        public IActionResult CategoriaReativar(int id)
+        {
+            try
+            {
+                var categoria = _context.CategoriaDoenca
+                    .Where(x => x.StAtivo == 'N')
+                    .FirstOrDefault(x => x.Id == id);
+
+                if (categoria is null)
+                    return NotFound();
+
+                categoria.StAtivo = 'S';
+
+                _context.CategoriaDoenca.Update(categoria);
+                _context.SaveChanges();
+
+                return Ok(categoria);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         [HttpDelete("{id}")]
         [SwaggerOperation(
-            Summary = "Remove uma categoria de doença",
-            Description = "Remove uma categoria clínica do sistema."
+            Summary = "Inativa uma categoria de doença",
+            Description = "Realiza a exclusão lógica de uma categoria clínica (soft delete)."
         )]
         public IActionResult CategoriaDelete(int id)
         {
             try
             {
-                var categoria = _context.CategoriaDoenca.FirstOrDefault(x => x.Id == id);
+                var categoria = _context.CategoriaDoenca
+                    .Where(x => x.StAtivo == 'S')
+                    .FirstOrDefault(x => x.Id == id);
 
                 if (categoria is null)
                     return NotFound();
 
-                _context.CategoriaDoenca.Remove(categoria);
+                categoria.StAtivo = 'N';
+
+                _context.CategoriaDoenca.Update(categoria);
                 _context.SaveChanges();
 
                 return NoContent();

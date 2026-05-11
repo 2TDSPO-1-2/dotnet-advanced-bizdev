@@ -33,5 +33,9 @@ namespace Arkive_API.Models
 
         [Column("DS_SINTOMAS", TypeName = "CLOB")]
         public string? Sintomas { get; set; }
+
+        [Column("ST_ATIVO")]
+        [Required]
+        public char StAtivo { get; set; } = 'S';
     }
 }

@@ -20,7 +20,7 @@ namespace Arkive_API.Controllers
         [HttpGet]
         [SwaggerOperation(
             Summary = "Lista todas as raças",
-            Description = "Retorna todas as raças cadastradas, incluindo a espécie vinculada."
+            Description = "Retorna todas as raças, incluindo a espécie vinculada."
         )]
         public IActionResult GetAllRacas()
         {
@@ -28,6 +28,56 @@ namespace Arkive_API.Controllers
             {
                 var resultado = _context.Raca
                     .Include(x => x.Especie)
+                    .ToList();
+
+                if (!resultado.Any())
+                    return NoContent();
+
+                return Ok(resultado);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("ativos")]
+        [SwaggerOperation(
+            Summary = "Lista raças ativas",
+            Description = "Retorna todas as raças com status ativo."
+        )]
+        public IActionResult GetRacasAtivas()
+        {
+            try
+            {
+                var resultado = _context.Raca
+                    .Include(x => x.Especie)
+                    .Where(x => x.StAtivo == 'S')
+                    .ToList();
+
+                if (!resultado.Any())
+                    return NoContent();
+
+                return Ok(resultado);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("inativos")]
+        [SwaggerOperation(
+            Summary = "Lista raças inativas",
+            Description = "Retorna todas as raças com status inativo (excluídas logicamente)."
+        )]
+        public IActionResult GetRacasInativas()
+        {
+            try
+            {
+                var resultado = _context.Raca
+                    .Include(x => x.Especie)
+                    .Where(x => x.StAtivo == 'N')
                     .ToList();
 
                 if (!resultado.Any())
@@ -52,6 +102,7 @@ namespace Arkive_API.Controllers
             {
                 var raca = _context.Raca
                     .Include(x => x.Especie)
+                    .Where(x => x.StAtivo == 'S')
                     .FirstOrDefault(x => x.Id == id);
 
                 if (raca is null)
@@ -68,7 +119,7 @@ namespace Arkive_API.Controllers
         [HttpGet("especie/{idEspecie}")]
         [SwaggerOperation(
             Summary = "Lista raças por espécie",
-            Description = "Retorna todas as raças vinculadas a uma espécie específica."
+            Description = "Retorna todas as raças ativas vinculadas a uma espécie específica."
         )]
         public IActionResult GetRacasByEspecie(int idEspecie)
         {
@@ -76,7 +127,7 @@ namespace Arkive_API.Controllers
             {
                 var resultado = _context.Raca
                     .Include(x => x.Especie)
-                    .Where(x => x.IdEspecie == idEspecie)
+                    .Where(x => x.StAtivo == 'S' && x.IdEspecie == idEspecie)
                     .ToList();
 
                 if (!resultado.Any())
@@ -99,6 +150,8 @@ namespace Arkive_API.Controllers
         {
             try
             {
+                model.StAtivo = 'S';
+
                 _context.Raca.Add(model);
                 _context.SaveChanges();
 
@@ -119,7 +172,9 @@ namespace Arkive_API.Controllers
         {
             try
             {
-                var raca = _context.Raca.FirstOrDefault(x => x.Id == id);
+                var raca = _context.Raca
+                    .Where(x => x.StAtivo == 'S')
+                    .FirstOrDefault(x => x.Id == id);
 
                 if (raca is null)
                     return NotFound();
@@ -139,21 +194,54 @@ namespace Arkive_API.Controllers
             }
         }
 
+        [HttpPut("reativar/{id}")]
+        [SwaggerOperation(
+            Summary = "Reativa uma raça",
+            Description = "Restaura uma raça previamente inativada."
+        )]
+        public IActionResult RacaReativar(int id)
+        {
+            try
+            {
+                var raca = _context.Raca
+                    .Where(x => x.StAtivo == 'N')
+                    .FirstOrDefault(x => x.Id == id);
+
+                if (raca is null)
+                    return NotFound();
+
+                raca.StAtivo = 'S';
+
+                _context.Raca.Update(raca);
+                _context.SaveChanges();
+
+                return Ok(raca);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         [HttpDelete("{id}")]
         [SwaggerOperation(
-            Summary = "Remove uma raça",
-            Description = "Remove uma raça do sistema."
+            Summary = "Inativa uma raça",
+            Description = "Realiza a exclusão lógica de uma raça (soft delete)."
         )]
         public IActionResult RacaDelete(int id)
         {
             try
             {
-                var raca = _context.Raca.FirstOrDefault(x => x.Id == id);
+                var raca = _context.Raca
+                    .Where(x => x.StAtivo == 'S')
+                    .FirstOrDefault(x => x.Id == id);
 
                 if (raca is null)
                     return NotFound();
 
-                _context.Raca.Remove(raca);
+                raca.StAtivo = 'N';
+
+                _context.Raca.Update(raca);
                 _context.SaveChanges();
 
                 return NoContent();

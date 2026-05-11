@@ -18,7 +18,7 @@ namespace Arkive_API.Controllers
 
         [HttpGet]
         [SwaggerOperation(
-            Summary = "Lista todas as espécies",
+            Summary = "Lista todas as espécies ativas",
             Description = "Retorna todas as espécies cadastradas no sistema."
         )]
         public IActionResult GetAllEspecies()
@@ -26,6 +26,54 @@ namespace Arkive_API.Controllers
             try
             {
                 var resultado = _context.Especie.ToList();
+
+                if (!resultado.Any())
+                    return NoContent();
+
+                return Ok(resultado);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("ativos")]
+        [SwaggerOperation(
+            Summary = "Lista espécies ativas",
+            Description = "Retorna todas as espécies com status ativo."
+        )]
+        public IActionResult GetEspeciesAtivas()
+        {
+            try
+            {
+                var resultado = _context.Especie
+                    .Where(x => x.StAtivo == 'S')
+                    .ToList();
+
+                if (!resultado.Any())
+                    return NoContent();
+
+                return Ok(resultado);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("inativos")]
+        [SwaggerOperation(
+            Summary = "Lista espécies inativas",
+            Description = "Retorna todas as espécies com status inativo (excluídas logicamente)."
+        )]
+        public IActionResult GetEspeciesInativas()
+        {
+            try
+            {
+                var resultado = _context.Especie
+                    .Where(x => x.StAtivo == 'N')
+                    .ToList();
 
                 if (!resultado.Any())
                     return NoContent();
@@ -47,7 +95,9 @@ namespace Arkive_API.Controllers
         {
             try
             {
-                var especie = _context.Especie.FirstOrDefault(x => x.Id == id);
+                var especie = _context.Especie
+                    .Where(x => x.StAtivo == 'S')
+                    .FirstOrDefault(x => x.Id == id);
 
                 if (especie is null)
                     return NotFound();
@@ -69,6 +119,8 @@ namespace Arkive_API.Controllers
         {
             try
             {
+                model.StAtivo = 'S';
+
                 _context.Especie.Add(model);
                 _context.SaveChanges();
 
@@ -89,7 +141,9 @@ namespace Arkive_API.Controllers
         {
             try
             {
-                var especie = _context.Especie.FirstOrDefault(x => x.Id == id);
+                var especie = _context.Especie
+                    .Where(x => x.StAtivo == 'S')
+                    .FirstOrDefault(x => x.Id == id);
 
                 if (especie is null)
                     return NotFound();
@@ -107,21 +161,54 @@ namespace Arkive_API.Controllers
             }
         }
 
+        [HttpPut("reativar/{id}")]
+        [SwaggerOperation(
+            Summary = "Reativa uma espécie",
+            Description = "Restaura uma espécie previamente inativada."
+        )]
+        public IActionResult EspecieReativar(int id)
+        {
+            try
+            {
+                var especie = _context.Especie
+                    .Where(x => x.StAtivo == 'N')
+                    .FirstOrDefault(x => x.Id == id);
+
+                if (especie is null)
+                    return NotFound();
+
+                especie.StAtivo = 'S';
+
+                _context.Especie.Update(especie);
+                _context.SaveChanges();
+
+                return Ok(especie);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         [HttpDelete("{id}")]
         [SwaggerOperation(
-            Summary = "Remove uma espécie",
-            Description = "Remove uma espécie do sistema."
+            Summary = "Inativa uma espécie",
+            Description = "Realiza a exclusão lógica de uma espécie (soft delete)."
         )]
         public IActionResult EspecieDelete(int id)
         {
             try
             {
-                var especie = _context.Especie.FirstOrDefault(x => x.Id == id);
+                var especie = _context.Especie
+                    .Where(x => x.StAtivo == 'S')
+                    .FirstOrDefault(x => x.Id == id);
 
                 if (especie is null)
                     return NotFound();
 
-                _context.Especie.Remove(especie);
+                especie.StAtivo = 'N';
+
+                _context.Especie.Update(especie);
                 _context.SaveChanges();
 
                 return NoContent();

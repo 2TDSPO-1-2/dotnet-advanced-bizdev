@@ -19,8 +19,8 @@ namespace Arkive_API.Controllers
 
         [HttpGet]
         [SwaggerOperation(
-            Summary = "Lista todas as doenças",
-            Description = "Retorna todas as doenças cadastradas, incluindo a categoria clínica vinculada."
+            Summary = "Lista todas as doenças ativas",
+            Description = "Retorna todas as doenças, incluindo a categoria clínica vinculada."
         )]
         public IActionResult GetAllDoencas()
         {
@@ -28,6 +28,56 @@ namespace Arkive_API.Controllers
             {
                 var resultado = _context.Doenca
                     .Include(x => x.Categoria)
+                    .ToList();
+
+                if (!resultado.Any())
+                    return NoContent();
+
+                return Ok(resultado);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("ativos")]
+        [SwaggerOperation(
+            Summary = "Lista doenças ativas",
+            Description = "Retorna todas as doenças com status ativo."
+        )]
+        public IActionResult GetDoencasAtivas()
+        {
+            try
+            {
+                var resultado = _context.Doenca
+                    .Include(x => x.Categoria)
+                    .Where(x => x.StAtivo == 'S')
+                    .ToList();
+
+                if (!resultado.Any())
+                    return NoContent();
+
+                return Ok(resultado);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("inativos")]
+        [SwaggerOperation(
+            Summary = "Lista doenças inativas",
+            Description = "Retorna todas as doenças com status inativo (excluídas logicamente)."
+        )]
+        public IActionResult GetDoencasInativas()
+        {
+            try
+            {
+                var resultado = _context.Doenca
+                    .Include(x => x.Categoria)
+                    .Where(x => x.StAtivo == 'N')
                     .ToList();
 
                 if (!resultado.Any())
@@ -52,6 +102,7 @@ namespace Arkive_API.Controllers
             {
                 var doenca = _context.Doenca
                     .Include(x => x.Categoria)
+                    .Where(x => x.StAtivo == 'S')
                     .FirstOrDefault(x => x.Id == id);
 
                 if (doenca is null)
@@ -68,7 +119,7 @@ namespace Arkive_API.Controllers
         [HttpGet("nome/{nome}")]
         [SwaggerOperation(
             Summary = "Busca doenças por nome",
-            Description = "Retorna todas as doenças cujo nome contenha o termo informado (busca parcial)."
+            Description = "Retorna todas as doenças ativas cujo nome contenha o termo informado (busca parcial)."
         )]
         public IActionResult GetDoencaByNome(string nome)
         {
@@ -76,7 +127,7 @@ namespace Arkive_API.Controllers
             {
                 var resultado = _context.Doenca
                     .Include(x => x.Categoria)
-                    .Where(x => x.Nome.ToLower().Contains(nome.ToLower()))
+                    .Where(x => x.StAtivo == 'S' && x.Nome.ToLower().Contains(nome.ToLower()))
                     .ToList();
 
                 if (!resultado.Any())
@@ -93,7 +144,7 @@ namespace Arkive_API.Controllers
         [HttpGet("categoria/{idCategoria}")]
         [SwaggerOperation(
             Summary = "Lista doenças por categoria",
-            Description = "Retorna todas as doenças vinculadas a uma categoria clínica específica."
+            Description = "Retorna todas as doenças ativas vinculadas a uma categoria clínica específica."
         )]
         public IActionResult GetDoencaByCategoria(int idCategoria)
         {
@@ -101,7 +152,7 @@ namespace Arkive_API.Controllers
             {
                 var resultado = _context.Doenca
                     .Include(x => x.Categoria)
-                    .Where(x => x.IdCategoria == idCategoria)
+                    .Where(x => x.StAtivo == 'S' && x.IdCategoria == idCategoria)
                     .ToList();
 
                 if (!resultado.Any())
@@ -124,6 +175,8 @@ namespace Arkive_API.Controllers
         {
             try
             {
+                model.StAtivo = 'S';
+
                 _context.Doenca.Add(model);
                 _context.SaveChanges();
 
@@ -144,7 +197,9 @@ namespace Arkive_API.Controllers
         {
             try
             {
-                var doenca = _context.Doenca.FirstOrDefault(x => x.Id == id);
+                var doenca = _context.Doenca
+                    .Where(x => x.StAtivo == 'S')
+                    .FirstOrDefault(x => x.Id == id);
 
                 if (doenca is null)
                     return NotFound();
@@ -166,21 +221,54 @@ namespace Arkive_API.Controllers
             }
         }
 
+        [HttpPut("reativar/{id}")]
+        [SwaggerOperation(
+            Summary = "Reativa uma doença",
+            Description = "Restaura uma doença previamente inativada."
+        )]
+        public IActionResult DoencaReativar(int id)
+        {
+            try
+            {
+                var doenca = _context.Doenca
+                    .Where(x => x.StAtivo == 'N')
+                    .FirstOrDefault(x => x.Id == id);
+
+                if (doenca is null)
+                    return NotFound();
+
+                doenca.StAtivo = 'S';
+
+                _context.Doenca.Update(doenca);
+                _context.SaveChanges();
+
+                return Ok(doenca);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         [HttpDelete("{id}")]
         [SwaggerOperation(
-            Summary = "Remove uma doença",
-            Description = "Remove uma doença do catálogo clínico."
+            Summary = "Inativa uma doença",
+            Description = "Realiza a exclusão lógica de uma doença (soft delete)."
         )]
         public IActionResult DoencaDelete(int id)
         {
             try
             {
-                var doenca = _context.Doenca.FirstOrDefault(x => x.Id == id);
+                var doenca = _context.Doenca
+                    .Where(x => x.StAtivo == 'S')
+                    .FirstOrDefault(x => x.Id == id);
 
                 if (doenca is null)
                     return NotFound();
 
-                _context.Doenca.Remove(doenca);
+                doenca.StAtivo = 'N';
+
+                _context.Doenca.Update(doenca);
                 _context.SaveChanges();
 
                 return NoContent();

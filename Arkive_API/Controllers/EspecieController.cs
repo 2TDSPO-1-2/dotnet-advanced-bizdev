@@ -96,7 +96,6 @@ namespace Arkive_API.Controllers
             try
             {
                 var especie = _context.Especie
-                    .Where(x => x.StAtivo == 'S')
                     .FirstOrDefault(x => x.Id == id);
 
                 if (especie is null)

@@ -96,7 +96,6 @@ namespace Arkive_API.Controllers
             try
             {
                 var categoria = _context.CategoriaDoenca
-                    .Where(x => x.StAtivo == 'S')
                     .FirstOrDefault(x => x.Id == id);
 
                 if (categoria is null)

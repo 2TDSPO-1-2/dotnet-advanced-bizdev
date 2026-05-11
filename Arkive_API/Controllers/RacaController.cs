@@ -102,7 +102,6 @@ namespace Arkive_API.Controllers
             {
                 var raca = _context.Raca
                     .Include(x => x.Especie)
-                    .Where(x => x.StAtivo == 'S')
                     .FirstOrDefault(x => x.Id == id);
 
                 if (raca is null)

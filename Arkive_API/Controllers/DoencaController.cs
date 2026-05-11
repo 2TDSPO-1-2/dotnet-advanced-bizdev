@@ -102,7 +102,6 @@ namespace Arkive_API.Controllers
             {
                 var doenca = _context.Doenca
                     .Include(x => x.Categoria)
-                    .Where(x => x.StAtivo == 'S')
                     .FirstOrDefault(x => x.Id == id);
 
                 if (doenca is null)

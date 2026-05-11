@@ -23,6 +23,9 @@ namespace Arkive_API.Models
         [Column("ID_CONSULTA")]
         public int? IdConsulta { get; set; }
 
+        [Column("ID_VETERINARIO")]
+        public int? IdVeterinario { get; set; }
+
         [Required(ErrorMessage = "A Nota é obrigatória.")]
         [Column("NR_NOTA")]
         [Range(0, 10, ErrorMessage = "A Nota deve estar entre 0 e 10")]
@@ -31,8 +34,8 @@ namespace Arkive_API.Models
         [Column("DS_COMENTARIO", TypeName = "CLOB")]
         public string? Comentario { get; set; }
 
-        [Required(ErrorMessage = "A Data da resposta é obrigatória")]
-        [Column("DT_RESPOSTA")]
-        public DateTime Resposta { get; set; } = DateTime.Now;
+        [Required(ErrorMessage = "A Data do Feedback é obrigatória")]
+        [Column("DT_FEEDBACK")]
+        public DateTime DataFeedback { get; set; } = DateTime.Now;
     }
 }

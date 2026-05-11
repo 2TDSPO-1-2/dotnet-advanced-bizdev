@@ -23,5 +23,6 @@ namespace Arkive_API.Data
         public DbSet<AnimalExternal> Animal { get; set; }
         public DbSet<ClinicaExternal> Clinica { get; set; }
         public DbSet<ConsultaExternal> Consulta { get; set; }
+        public DbSet<VeterinarioExternal> Veterinario { get; set; }
     }
 }

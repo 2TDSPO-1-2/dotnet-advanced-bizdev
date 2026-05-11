@@ -34,4 +34,12 @@ namespace Arkive_API.Models.External
         [Column("ID_CONSULTA")]
         public int Id { get; set; }
     }
+
+    [Table("TB_ARKIVE_VETERINARIO")]
+    public class VeterinarioExternal
+    {
+        [Key]
+        [Column("ID_VETERINARIO")]
+        public int Id { get; set; }
+    }
 }

@@ -19,7 +19,7 @@ namespace Arkive_API.Controllers
 
         [HttpGet]
         [SwaggerOperation(
-            Summary = "Lista todas as doenças ativas",
+            Summary = "Lista todas as doenças",
             Description = "Retorna todas as doenças, incluindo a categoria clínica vinculada."
         )]
         public IActionResult GetAllDoencas()

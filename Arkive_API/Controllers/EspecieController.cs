@@ -18,7 +18,7 @@ namespace Arkive_API.Controllers
 
         [HttpGet]
         [SwaggerOperation(
-            Summary = "Lista todas as espécies ativas",
+            Summary = "Lista todas as espécies",
             Description = "Retorna todas as espécies cadastradas no sistema."
         )]
         public IActionResult GetAllEspecies()

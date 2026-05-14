@@ -210,7 +210,7 @@ namespace Arkive_API.Controllers
                 _context.Especie.Update(especie);
                 _context.SaveChanges();
 
-                return NoContent();
+                return Ok(especie);
             }
             catch (Exception ex)
             {

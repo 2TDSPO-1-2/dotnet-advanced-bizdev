@@ -243,7 +243,7 @@ namespace Arkive_API.Controllers
                 _context.Raca.Update(raca);
                 _context.SaveChanges();
 
-                return NoContent();
+                return Ok(raca);
             }
             catch (Exception ex)
             {

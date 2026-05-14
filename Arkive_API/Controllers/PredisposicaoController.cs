@@ -190,7 +190,7 @@ namespace Arkive_API.Controllers
                 _context.Predisposicao.Remove(predisposicao);
                 _context.SaveChanges();
 
-                return NoContent();
+                return Ok(predisposicao);
             }
             catch (Exception ex)
             {

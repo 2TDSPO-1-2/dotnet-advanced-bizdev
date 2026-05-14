@@ -270,7 +270,7 @@ namespace Arkive_API.Controllers
                 _context.Doenca.Update(doenca);
                 _context.SaveChanges();
 
-                return NoContent();
+                return Ok(doenca);
             }
             catch (Exception ex)
             {

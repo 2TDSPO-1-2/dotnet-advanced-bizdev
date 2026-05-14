@@ -273,7 +273,7 @@ namespace Arkive_API.Controllers
                 _context.FeedbackNPS.Remove(feedback);
                 _context.SaveChanges();
 
-                return NoContent();
+                return Ok(feedback);
             }
             catch (Exception ex)
             {

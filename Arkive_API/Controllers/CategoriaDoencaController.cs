@@ -210,7 +210,7 @@ namespace Arkive_API.Controllers
                 _context.CategoriaDoenca.Update(categoria);
                 _context.SaveChanges();
 
-                return NoContent();
+                return Ok(categoria);
             }
             catch (Exception ex)
             {

@@ -209,6 +209,15 @@ namespace Arkive_API.Controllers
                 raca.IdEspecie = model.IdEspecie;
                 raca.Porte = model.Porte;
 
+                if (model.IdEspecie != raca.IdEspecie)
+                {
+                    var especieExiste = await _context.Especie
+                        .AnyAsync(x => x.Id == model.IdEspecie && x.StAtivo == 'S');
+
+                    if (!especieExiste)
+                        return NotFound($"Espécie com ID {model.IdEspecie} não encontrada.");
+                }
+
                 _context.Raca.Update(raca);
                 await _context.SaveChangesAsync();
 

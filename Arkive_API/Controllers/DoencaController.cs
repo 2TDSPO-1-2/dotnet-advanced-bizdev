@@ -242,6 +242,15 @@ namespace Arkive_API.Controllers
                 doenca.CID = model.CID;
                 doenca.Sintomas = model.Sintomas;
 
+                if (model.IdCategoria is not null)
+                {
+                    var categoriaExiste = await _context.CategoriaDoenca
+                        .AnyAsync(x => x.Id == model.IdCategoria && x.StAtivo == 'S');
+
+                    if (!categoriaExiste)
+                        return NotFound($"Categoria com ID {model.IdCategoria} não encontrada.");
+                }
+
                 _context.Doenca.Update(doenca);
                 await _context.SaveChangesAsync();
 

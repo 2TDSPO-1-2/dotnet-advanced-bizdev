@@ -80,6 +80,10 @@ namespace Arkive_API.Controllers
         {
             try
             {
+                if (nota < 0 || nota > 10)
+                {
+                    return BadRequest("Nota inválida, deve estar entre 0 e 10");
+                }
                 var resultado = await _context.FeedbackNPS
                     .Where(x => x.Nota == nota)
                     .ToListAsync();

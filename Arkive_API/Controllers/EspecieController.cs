@@ -154,7 +154,7 @@ namespace Arkive_API.Controllers
         [SwaggerResponse(statusCode: 200, description: "Espécie atualizada com sucesso", type: typeof(EspecieEntity))]
         [SwaggerResponse(statusCode: 404, description: "Espécie não encontrada ou inativa")]
         [SwaggerResponse(statusCode: 400, description: "Ocorreu um erro ao atualizar a espécie", type: typeof(string))]
-        public async Task<IActionResult> EspecieUpdate(int id, EspecieEntity model)
+        public async Task<IActionResult> UpdateEspecie(int id, EspecieEntity model)
         {
             try
             {
@@ -186,7 +186,7 @@ namespace Arkive_API.Controllers
         [SwaggerResponse(statusCode: 200, description: "Espécie reativada com sucesso", type: typeof(EspecieEntity))]
         [SwaggerResponse(statusCode: 404, description: "Espécie não encontrada ou já está ativa")]
         [SwaggerResponse(statusCode: 400, description: "Ocorreu um erro ao reativar a espécie", type: typeof(string))]
-        public async Task<IActionResult> EspecieReativar(int id)
+        public async Task<IActionResult> ReactivateEspecie(int id)
         {
             try
             {
@@ -218,7 +218,7 @@ namespace Arkive_API.Controllers
         [SwaggerResponse(statusCode: 200, description: "Espécie inativada com sucesso", type: typeof(EspecieEntity))]
         [SwaggerResponse(statusCode: 404, description: "Espécie não encontrada ou já está inativa")]
         [SwaggerResponse(statusCode: 400, description: "Ocorreu um erro ao inativar a espécie", type: typeof(string))]
-        public async Task<IActionResult> EspecieDelete(int id)
+        public async Task<IActionResult> DeleteEspecie(int id)
         {
             try
             {

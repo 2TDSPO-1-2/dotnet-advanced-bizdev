@@ -225,7 +225,7 @@ namespace Arkive_API.Controllers
         [SwaggerResponse(statusCode: 200, description: "Doença atualizada com sucesso", type: typeof(DoencaEntity))]
         [SwaggerResponse(statusCode: 404, description: "Doença não encontrada ou inativa")]
         [SwaggerResponse(statusCode: 400, description: "Ocorreu um erro ao atualizar a doença", type: typeof(string))]
-        public async Task<IActionResult> DoencaUpdate(int id, DoencaEntity model)
+        public async Task<IActionResult> UpdateDoenca(int id, DoencaEntity model)
         {
             try
             {
@@ -270,7 +270,7 @@ namespace Arkive_API.Controllers
         [SwaggerResponse(statusCode: 200, description: "Doença reativada com sucesso", type: typeof(DoencaEntity))]
         [SwaggerResponse(statusCode: 404, description: "Doença não encontrada ou já está ativa")]
         [SwaggerResponse(statusCode: 400, description: "Ocorreu um erro ao reativar a doença", type: typeof(string))]
-        public async Task<IActionResult> DoencaReativar(int id)
+        public async Task<IActionResult> ReactivateDoenca(int id)
         {
             try
             {
@@ -302,7 +302,7 @@ namespace Arkive_API.Controllers
         [SwaggerResponse(statusCode: 200, description: "Doença inativada com sucesso", type: typeof(DoencaEntity))]
         [SwaggerResponse(statusCode: 404, description: "Doença não encontrada ou já está inativa")]
         [SwaggerResponse(statusCode: 400, description: "Ocorreu um erro ao inativar a doença", type: typeof(string))]
-        public async Task<IActionResult> DoencaDelete(int id)
+        public async Task<IActionResult> DeleteDoenca(int id)
         {
             try
             {

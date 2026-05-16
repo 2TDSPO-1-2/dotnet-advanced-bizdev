@@ -194,7 +194,7 @@ namespace Arkive_API.Controllers
         [SwaggerResponse(statusCode: 200, description: "Raça atualizada com sucesso", type: typeof(RacaEntity))]
         [SwaggerResponse(statusCode: 404, description: "Raça não encontrada ou inativa")]
         [SwaggerResponse(statusCode: 400, description: "Ocorreu um erro ao atualizar a raça", type: typeof(string))]
-        public async Task<IActionResult> RacaUpdate(int id, RacaEntity model)
+        public async Task<IActionResult> UpdateRaca(int id, RacaEntity model)
         {
             try
             {
@@ -237,7 +237,7 @@ namespace Arkive_API.Controllers
         [SwaggerResponse(statusCode: 200, description: "Raça reativada com sucesso", type: typeof(RacaEntity))]
         [SwaggerResponse(statusCode: 404, description: "Raça não encontrada ou já está ativa")]
         [SwaggerResponse(statusCode: 400, description: "Ocorreu um erro ao reativar a raça", type: typeof(string))]
-        public async Task<IActionResult> RacaReativar(int id)
+        public async Task<IActionResult> ReactivateRaca(int id)
         {
             try
             {
@@ -269,7 +269,7 @@ namespace Arkive_API.Controllers
         [SwaggerResponse(statusCode: 200, description: "Raça inativada com sucesso", type: typeof(RacaEntity))]
         [SwaggerResponse(statusCode: 404, description: "Raça não encontrada ou já está inativa")]
         [SwaggerResponse(statusCode: 400, description: "Ocorreu um erro ao inativar a raça", type: typeof(string))]
-        public async Task<IActionResult> RacaDelete(int id)
+        public async Task<IActionResult> DeleteRaca(int id)
         {
             try
             {

@@ -220,7 +220,7 @@ namespace Arkive_API.Controllers
         [SwaggerResponse(statusCode: 200, description: "Predisposição removida com sucesso", type: typeof(PredisposicaoEntity))]
         [SwaggerResponse(statusCode: 404, description: "Predisposição não encontrada")]
         [SwaggerResponse(statusCode: 400, description: "Ocorreu um erro ao remover a predisposição", type: typeof(string))]
-        public async Task<IActionResult> PredisposicaoDelete(int id)
+        public async Task<IActionResult> DeletePredisposicao(int id)
         {
             try
             {

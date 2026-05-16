@@ -154,7 +154,7 @@ namespace Arkive_API.Controllers
         [SwaggerResponse(statusCode: 200, description: "Categoria atualizada com sucesso", type: typeof(CategoriaDoencaEntity))]
         [SwaggerResponse(statusCode: 404, description: "Categoria não encontrada ou inativa")]
         [SwaggerResponse(statusCode: 400, description: "Ocorreu um erro ao atualizar a categoria", type: typeof(string))]
-        public async Task<IActionResult> CategoriaUpdate(int id, CategoriaDoencaEntity model)
+        public async Task<IActionResult> UpdateCategoria(int id, CategoriaDoencaEntity model)
         {
             try
             {
@@ -186,7 +186,7 @@ namespace Arkive_API.Controllers
         [SwaggerResponse(statusCode: 200, description: "Categoria reativada com sucesso", type: typeof(CategoriaDoencaEntity))]
         [SwaggerResponse(statusCode: 404, description: "Categoria não encontrada ou já está ativa")]
         [SwaggerResponse(statusCode: 400, description: "Ocorreu um erro ao reativar a categoria", type: typeof(string))]
-        public async Task<IActionResult> CategoriaReativar(int id)
+        public async Task<IActionResult> ReactivateCategoria(int id)
         {
             try
             {
@@ -218,7 +218,7 @@ namespace Arkive_API.Controllers
         [SwaggerResponse(statusCode: 200, description: "Categoria inativada com sucesso", type: typeof(CategoriaDoencaEntity))]
         [SwaggerResponse(statusCode: 404, description: "Categoria não encontrada ou já está inativa")]
         [SwaggerResponse(statusCode: 400, description: "Ocorreu um erro ao inativar a categoria", type: typeof(string))]
-        public async Task<IActionResult> CategoriaDelete(int id)
+        public async Task<IActionResult> DeleteCategoria(int id)
         {
             try
             {

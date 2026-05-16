@@ -245,7 +245,7 @@ namespace Arkive_API.Controllers
         {
             try
             {
-                // Espelha CK_ARKIVE_NPS_CONTEXTO: ao menos um contexto é obrigatório
+
                 if (model.IdResponsavel is null && model.IdAnimal is null &&
                     model.IdClinica is null && model.IdConsulta is null &&
                     model.IdVeterinario is null)
@@ -293,7 +293,7 @@ namespace Arkive_API.Controllers
         [SwaggerResponse(statusCode: 200, description: "Feedback removido com sucesso", type: typeof(FeedbackNPSEntity))]
         [SwaggerResponse(statusCode: 404, description: "Feedback não encontrado")]
         [SwaggerResponse(statusCode: 400, description: "Ocorreu um erro ao remover o feedback", type: typeof(string))]
-        public async Task<IActionResult> FeedbackDelete(int id)
+        public async Task<IActionResult> DeleteFeedback(int id)
         {
             try
             {

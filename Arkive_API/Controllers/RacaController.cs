@@ -58,7 +58,7 @@ namespace Arkive_API.Controllers
             {
                 var resultado = await _context.Raca
                     .Include(x => x.Especie)
-                    .Where(x => x.StAtivo == 'S')
+                    .Where(x => x.StAtivo == "S")
                     .ToListAsync();
 
                 if (!resultado.Any())
@@ -86,7 +86,7 @@ namespace Arkive_API.Controllers
             {
                 var resultado = await _context.Raca
                     .Include(x => x.Especie)
-                    .Where(x => x.StAtivo == 'N')
+                    .Where(x => x.StAtivo == "N")
                     .ToListAsync();
 
                 if (!resultado.Any())
@@ -141,7 +141,7 @@ namespace Arkive_API.Controllers
             {
                 var resultado = await _context.Raca
                     .Include(x => x.Especie)
-                    .Where(x => x.StAtivo == 'S' && x.IdEspecie == idEspecie)
+                    .Where(x => x.StAtivo == "S" && x.IdEspecie == idEspecie)
                     .ToListAsync();
 
                 if (!resultado.Any())
@@ -167,13 +167,14 @@ namespace Arkive_API.Controllers
         {
             try
             {
-                var especieExiste = await _context.Especie
-                    .AnyAsync(x => x.Id == model.IdEspecie && x.StAtivo == 'S');
+                var especie = await _context.Especie
+                    .FirstOrDefaultAsync(x => x.Id == model.IdEspecie && x.StAtivo == "S");
 
-                if (!especieExiste)
+                if (especie is null)
                     return NotFound($"Espécie com ID {model.IdEspecie} não encontrada.");
 
-                model.StAtivo = 'S';
+                model.StAtivo = "S";
+                model.Porte = model.Porte?.ToUpper();
 
                 _context.Raca.Add(model);
                 await _context.SaveChangesAsync();
@@ -199,24 +200,25 @@ namespace Arkive_API.Controllers
             try
             {
                 var raca = await _context.Raca
-                    .Where(x => x.StAtivo == 'S')
+                    .Include(x => x.Especie)
+                    .Where(x => x.StAtivo == "S")
                     .FirstOrDefaultAsync(x => x.Id == id);
 
                 if (raca is null)
                     return NotFound();
 
-                raca.Raca = model.Raca;
-                raca.IdEspecie = model.IdEspecie;
-                raca.Porte = model.Porte;
-
                 if (model.IdEspecie != raca.IdEspecie)
                 {
-                    var especieExiste = await _context.Especie
-                        .AnyAsync(x => x.Id == model.IdEspecie && x.StAtivo == 'S');
+                    var especie = await _context.Especie
+                        .FirstOrDefaultAsync(x => x.Id == model.IdEspecie && x.StAtivo == "S");
 
-                    if (!especieExiste)
+                    if (especie is null)
                         return NotFound($"Espécie com ID {model.IdEspecie} não encontrada.");
                 }
+
+                raca.Raca = model.Raca;
+                raca.IdEspecie = model.IdEspecie;
+                raca.Porte = model.Porte?.ToUpper();
 
                 _context.Raca.Update(raca);
                 await _context.SaveChangesAsync();
@@ -242,13 +244,14 @@ namespace Arkive_API.Controllers
             try
             {
                 var raca = await _context.Raca
-                    .Where(x => x.StAtivo == 'N')
+                    .Include(x => x.Especie)
+                    .Where(x => x.StAtivo == "N")
                     .FirstOrDefaultAsync(x => x.Id == id);
 
                 if (raca is null)
                     return NotFound();
 
-                raca.StAtivo = 'S';
+                raca.StAtivo = "S";
 
                 _context.Raca.Update(raca);
                 await _context.SaveChangesAsync();
@@ -274,13 +277,14 @@ namespace Arkive_API.Controllers
             try
             {
                 var raca = await _context.Raca
-                    .Where(x => x.StAtivo == 'S')
+                    .Include(x => x.Especie)
+                    .Where(x => x.StAtivo == "S")
                     .FirstOrDefaultAsync(x => x.Id == id);
 
                 if (raca is null)
                     return NotFound();
 
-                raca.StAtivo = 'N';
+                raca.StAtivo = "N";
 
                 _context.Raca.Update(raca);
                 await _context.SaveChangesAsync();

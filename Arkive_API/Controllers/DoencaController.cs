@@ -58,7 +58,7 @@ namespace Arkive_API.Controllers
             {
                 var resultado = await _context.Doenca
                     .Include(x => x.Categoria)
-                    .Where(x => x.StAtivo == 'S')
+                    .Where(x => x.StAtivo == "S")
                     .ToListAsync();
 
                 if (!resultado.Any())
@@ -86,7 +86,7 @@ namespace Arkive_API.Controllers
             {
                 var resultado = await _context.Doenca
                     .Include(x => x.Categoria)
-                    .Where(x => x.StAtivo == 'N')
+                    .Where(x => x.StAtivo == "N")
                     .ToListAsync();
 
                 if (!resultado.Any())
@@ -141,7 +141,7 @@ namespace Arkive_API.Controllers
             {
                 var resultado = await _context.Doenca
                     .Include(x => x.Categoria)
-                    .Where(x => x.StAtivo == 'S' && x.Nome.ToLower().Contains(nome.ToLower()))
+                    .Where(x => x.StAtivo == "S" && x.Nome.ToLower().Contains(nome.ToLower()))
                     .ToListAsync();
 
                 if (!resultado.Any())
@@ -169,7 +169,7 @@ namespace Arkive_API.Controllers
             {
                 var resultado = await _context.Doenca
                     .Include(x => x.Categoria)
-                    .Where(x => x.StAtivo == 'S' && x.IdCategoria == idCategoria)
+                    .Where(x => x.StAtivo == "S" && x.IdCategoria == idCategoria)
                     .ToListAsync();
 
                 if (!resultado.Any())
@@ -197,14 +197,14 @@ namespace Arkive_API.Controllers
             {
                 if (model.IdCategoria is not null)
                 {
-                    var categoriaExiste = await _context.CategoriaDoenca
-                        .AnyAsync(x => x.Id == model.IdCategoria && x.StAtivo == 'S');
+                    var categoria = await _context.CategoriaDoenca
+                        .FirstOrDefaultAsync(x => x.Id == model.IdCategoria && x.StAtivo == "S");
 
-                    if (!categoriaExiste)
+                    if (categoria is null)
                         return NotFound($"Categoria com ID {model.IdCategoria} não encontrada.");
                 }
 
-                model.StAtivo = 'S';
+                model.StAtivo = "S";
 
                 _context.Doenca.Add(model);
                 await _context.SaveChangesAsync();
@@ -230,26 +230,26 @@ namespace Arkive_API.Controllers
             try
             {
                 var doenca = await _context.Doenca
-                    .Where(x => x.StAtivo == 'S')
+                    .Where(x => x.StAtivo == "S")
                     .FirstOrDefaultAsync(x => x.Id == id);
 
                 if (doenca is null)
                     return NotFound();
+
+                if (model.IdCategoria is not null)
+                {
+                    var categoria = await _context.CategoriaDoenca
+                        .FirstOrDefaultAsync(x => x.Id == model.IdCategoria && x.StAtivo == "S");
+
+                    if (categoria is null)
+                        return NotFound($"Categoria com ID {model.IdCategoria} não encontrada.");
+                }
 
                 doenca.Nome = model.Nome;
                 doenca.IdCategoria = model.IdCategoria;
                 doenca.Descricao = model.Descricao;
                 doenca.CID = model.CID;
                 doenca.Sintomas = model.Sintomas;
-
-                if (model.IdCategoria is not null)
-                {
-                    var categoriaExiste = await _context.CategoriaDoenca
-                        .AnyAsync(x => x.Id == model.IdCategoria && x.StAtivo == 'S');
-
-                    if (!categoriaExiste)
-                        return NotFound($"Categoria com ID {model.IdCategoria} não encontrada.");
-                }
 
                 _context.Doenca.Update(doenca);
                 await _context.SaveChangesAsync();
@@ -275,13 +275,14 @@ namespace Arkive_API.Controllers
             try
             {
                 var doenca = await _context.Doenca
-                    .Where(x => x.StAtivo == 'N')
+                    .Include(x => x.Categoria)
+                    .Where(x => x.StAtivo == "N")
                     .FirstOrDefaultAsync(x => x.Id == id);
 
                 if (doenca is null)
                     return NotFound();
 
-                doenca.StAtivo = 'S';
+                doenca.StAtivo = "S";
 
                 _context.Doenca.Update(doenca);
                 await _context.SaveChangesAsync();
@@ -307,13 +308,14 @@ namespace Arkive_API.Controllers
             try
             {
                 var doenca = await _context.Doenca
-                    .Where(x => x.StAtivo == 'S')
+                    .Include(x => x.Categoria)
+                    .Where(x => x.StAtivo == "S")
                     .FirstOrDefaultAsync(x => x.Id == id);
 
                 if (doenca is null)
                     return NotFound();
 
-                doenca.StAtivo = 'N';
+                doenca.StAtivo = "N";
 
                 _context.Doenca.Update(doenca);
                 await _context.SaveChangesAsync();

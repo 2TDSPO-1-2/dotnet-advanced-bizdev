@@ -18,7 +18,7 @@ namespace Arkive_API.Models
         public int IdEspecie { get; set; }
 
         [ForeignKey(nameof(IdEspecie))]
-        public EspecieEntity Especie { get; set; } = null!;
+        public EspecieEntity? Especie { get; set; }
 
         [Column("ID_RACA")]
         public int? IdRaca { get; set; }
@@ -31,6 +31,6 @@ namespace Arkive_API.Models
         public int IdDoenca { get; set; }
 
         [ForeignKey(nameof(IdDoenca))]
-        public DoencaEntity Doenca { get; set; } = null!;
+        public DoencaEntity? Doenca { get; set; }
     }
 }

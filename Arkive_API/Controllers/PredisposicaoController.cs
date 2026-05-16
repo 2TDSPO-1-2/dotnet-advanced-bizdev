@@ -33,6 +33,7 @@ namespace Arkive_API.Controllers
                     .Include(x => x.Especie)
                     .Include(x => x.Raca)
                     .Include(x => x.Doenca)
+                        .ThenInclude(d => d.Categoria)
                     .ToListAsync();
 
                 if (!resultado.Any())
@@ -62,6 +63,7 @@ namespace Arkive_API.Controllers
                     .Include(x => x.Especie)
                     .Include(x => x.Raca)
                     .Include(x => x.Doenca)
+                        .ThenInclude(d => d.Categoria)
                     .FirstOrDefaultAsync(x => x.Id == id);
 
                 if (predisposicao is null)
@@ -91,6 +93,7 @@ namespace Arkive_API.Controllers
                     .Include(x => x.Especie)
                     .Include(x => x.Raca)
                     .Include(x => x.Doenca)
+                        .ThenInclude(d => d.Categoria)
                     .Where(x => x.IdEspecie == idEspecie)
                     .ToListAsync();
 
@@ -121,6 +124,7 @@ namespace Arkive_API.Controllers
                     .Include(x => x.Especie)
                     .Include(x => x.Raca)
                     .Include(x => x.Doenca)
+                        .ThenInclude(d => d.Categoria)
                     .Where(x => x.IdRaca == idRaca)
                     .ToListAsync();
 
@@ -151,6 +155,7 @@ namespace Arkive_API.Controllers
                     .Include(x => x.Especie)
                     .Include(x => x.Raca)
                     .Include(x => x.Doenca)
+                        .ThenInclude(d => d.Categoria)
                     .Where(x => x.IdDoenca == idDoenca)
                     .ToListAsync();
 
@@ -177,31 +182,38 @@ namespace Arkive_API.Controllers
         {
             try
             {
-                var especieExiste = await _context.Especie
-                    .AnyAsync(x => x.Id == model.IdEspecie && x.StAtivo == 'S');
+                var especie = await _context.Especie
+                    .FirstOrDefaultAsync(x => x.Id == model.IdEspecie && x.StAtivo == "S");
 
-                if (!especieExiste)
+                if (especie is null)
                     return NotFound($"Espécie com ID {model.IdEspecie} não encontrada.");
 
                 if (model.IdRaca is not null)
                 {
-                    var racaExiste = await _context.Raca
-                        .AnyAsync(x => x.Id == model.IdRaca && x.StAtivo == 'S');
+                    var raca = await _context.Raca
+                        .FirstOrDefaultAsync(x => x.Id == model.IdRaca && x.StAtivo == "S");
 
-                    if (!racaExiste)
+                    if (raca is null)
                         return NotFound($"Raça com ID {model.IdRaca} não encontrada.");
                 }
 
-                var doencaExiste = await _context.Doenca
-                    .AnyAsync(x => x.Id == model.IdDoenca && x.StAtivo == 'S');
+                var doenca = await _context.Doenca
+                    .FirstOrDefaultAsync(x => x.Id == model.IdDoenca && x.StAtivo == "S");
 
-                if (!doencaExiste)
+                if (doenca is null)
                     return NotFound($"Doença com ID {model.IdDoenca} não encontrada.");
 
                 _context.Predisposicao.Add(model);
                 await _context.SaveChangesAsync();
 
-                return CreatedAtAction(nameof(GetPredisposicaoById), new { id = model.Id }, model);
+                var resultado = await _context.Predisposicao
+                    .Include(x => x.Especie)
+                    .Include(x => x.Raca)
+                    .Include(x => x.Doenca)
+                        .ThenInclude(d => d.Categoria)
+                    .FirstOrDefaultAsync(x => x.Id == model.Id);
+
+                return CreatedAtAction(nameof(GetPredisposicaoById), new { id = model.Id }, resultado);
             }
             catch (Exception ex)
             {
@@ -225,6 +237,10 @@ namespace Arkive_API.Controllers
             try
             {
                 var predisposicao = await _context.Predisposicao
+                    .Include(x => x.Especie)
+                    .Include(x => x.Raca)
+                    .Include(x => x.Doenca)
+                        .ThenInclude(d => d.Categoria)
                     .FirstOrDefaultAsync(x => x.Id == id);
 
                 if (predisposicao is null)

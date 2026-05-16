@@ -55,7 +55,7 @@ namespace Arkive_API.Controllers
             try
             {
                 var resultado = await _context.Especie
-                    .Where(x => x.StAtivo == 'S')
+                    .Where(x => x.StAtivo == "S")
                     .ToListAsync();
 
                 if (!resultado.Any())
@@ -82,7 +82,7 @@ namespace Arkive_API.Controllers
             try
             {
                 var resultado = await _context.Especie
-                    .Where(x => x.StAtivo == 'N')
+                    .Where(x => x.StAtivo == "N")
                     .ToListAsync();
 
                 if (!resultado.Any())
@@ -133,7 +133,7 @@ namespace Arkive_API.Controllers
         {
             try
             {
-                model.StAtivo = 'S';
+                model.StAtivo = "S";
 
                 _context.Especie.Add(model);
                 await _context.SaveChangesAsync();
@@ -159,7 +159,7 @@ namespace Arkive_API.Controllers
             try
             {
                 var especie = await _context.Especie
-                    .Where(x => x.StAtivo == 'S')
+                    .Where(x => x.StAtivo == "S")
                     .FirstOrDefaultAsync(x => x.Id == id);
 
                 if (especie is null)
@@ -191,13 +191,13 @@ namespace Arkive_API.Controllers
             try
             {
                 var especie = await _context.Especie
-                    .Where(x => x.StAtivo == 'N')
+                    .Where(x => x.StAtivo == "N")
                     .FirstOrDefaultAsync(x => x.Id == id);
 
                 if (especie is null)
                     return NotFound();
 
-                especie.StAtivo = 'S';
+                especie.StAtivo = "S";
 
                 _context.Especie.Update(especie);
                 await _context.SaveChangesAsync();
@@ -223,13 +223,13 @@ namespace Arkive_API.Controllers
             try
             {
                 var especie = await _context.Especie
-                    .Where(x => x.StAtivo == 'S')
+                    .Where(x => x.StAtivo == "S")
                     .FirstOrDefaultAsync(x => x.Id == id);
 
                 if (especie is null)
                     return NotFound();
 
-                especie.StAtivo = 'N';
+                especie.StAtivo = "N";
 
                 _context.Especie.Update(especie);
                 await _context.SaveChangesAsync();

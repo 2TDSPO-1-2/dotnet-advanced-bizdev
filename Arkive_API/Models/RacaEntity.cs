@@ -24,15 +24,16 @@ namespace Arkive_API.Models
         public int IdEspecie { get; set; }
 
         [ForeignKey(nameof(IdEspecie))]
-        public EspecieEntity Especie { get; set; } = null!;
+        public EspecieEntity? Especie { get; set; }
 
         [Column("TP_PORTE")]
-        [RegularExpression("Pequeno|Médio|Grande", ErrorMessage = "Tamanho/Porte inválido.")]
+        [RegularExpression("(?i)^(PEQUENO|MEDIO|GRANDE)$", ErrorMessage = "Tamanho/Porte inválido.")]
         public string? Porte { get; set; }
 
         [Column("ST_ATIVO")]
         [Required]
-        public char StAtivo { get; set; } = 'S';
+        [MaxLength(1)]
+        public string StAtivo { get; set; } = "S";
 
         [JsonIgnore]
         public ICollection<PredisposicaoEntity>? Predisposicoes { get; set; }

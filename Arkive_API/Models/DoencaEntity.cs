@@ -37,7 +37,8 @@ namespace Arkive_API.Models
 
         [Column("ST_ATIVO")]
         [Required]
-        public char StAtivo { get; set; } = 'S';
+        [MaxLength(1)]
+        public string StAtivo { get; set; } = "S";
 
         [JsonIgnore]
         public ICollection<PredisposicaoEntity>? Predisposicoes { get; set; }

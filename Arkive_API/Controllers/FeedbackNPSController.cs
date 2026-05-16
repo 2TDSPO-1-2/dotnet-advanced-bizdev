@@ -252,24 +252,34 @@ namespace Arkive_API.Controllers
                     return BadRequest("Informe ao menos um contexto: responsável, animal, clínica, consulta ou veterinário.");
 
                 // Valida existência dos IDs externos (tabelas gerenciadas pela API Java)
-                if (model.IdResponsavel is not null &&
-                    !await _context.Responsavel.AnyAsync(x => x.Id == model.IdResponsavel))
+                var responsavel = await _context.Responsavel
+                    .FirstOrDefaultAsync(x => x.Id == model.IdResponsavel);
+
+                var animal = await _context.Animal
+                    .FirstOrDefaultAsync(x => x.Id == model.IdAnimal);
+
+                var clinica = await _context.Clinica
+                    .FirstOrDefaultAsync(x => x.Id == model.IdClinica);
+
+                var consulta = await _context.Consulta
+                    .FirstOrDefaultAsync(x => x.Id == model.IdConsulta);
+
+                var veterinario = await _context.Veterinario
+                    .FirstOrDefaultAsync(x => x.Id == model.IdVeterinario);
+
+                if (model.IdResponsavel is not null && responsavel is null)
                     return NotFound($"Responsável com ID {model.IdResponsavel} não encontrado.");
 
-                if (model.IdAnimal is not null &&
-                    !await _context.Animal.AnyAsync(x => x.Id == model.IdAnimal))
+                if (model.IdAnimal is not null && animal is null)
                     return NotFound($"Animal com ID {model.IdAnimal} não encontrado.");
 
-                if (model.IdClinica is not null &&
-                    !await _context.Clinica.AnyAsync(x => x.Id == model.IdClinica))
+                if (model.IdClinica is not null && clinica is null)
                     return NotFound($"Clínica com ID {model.IdClinica} não encontrada.");
 
-                if (model.IdConsulta is not null &&
-                    !await _context.Consulta.AnyAsync(x => x.Id == model.IdConsulta))
+                if (model.IdConsulta is not null && consulta is null)
                     return NotFound($"Consulta com ID {model.IdConsulta} não encontrada.");
 
-                if (model.IdVeterinario is not null &&
-                    !await _context.Veterinario.AnyAsync(x => x.Id == model.IdVeterinario))
+                if (model.IdVeterinario is not null && veterinario is null)
                     return NotFound($"Veterinário com ID {model.IdVeterinario} não encontrado.");
 
                 _context.FeedbackNPS.Add(model);

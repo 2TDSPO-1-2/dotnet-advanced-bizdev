@@ -20,15 +20,18 @@ namespace Arkive_API.Controllers
         [HttpGet]
         [SwaggerOperation(
             Summary = "Lista todas as doenças",
-            Description = "Retorna todas as doenças, incluindo a categoria clínica vinculada."
+            Description = "Retorna todas as doenças cadastradas, incluindo a categoria clínica vinculada."
         )]
-        public IActionResult GetAllDoencas()
+        [SwaggerResponse(statusCode: 200, description: "Listagem de dados retornada com sucesso", type: typeof(IEnumerable<DoencaEntity>))]
+        [SwaggerResponse(statusCode: 204, description: "Nenhuma doença encontrada")]
+        [SwaggerResponse(statusCode: 400, description: "Ocorreu um erro ao retornar os dados", type: typeof(string))]
+        public async Task<IActionResult> GetAllDoencas()
         {
             try
             {
-                var resultado = _context.Doenca
+                var resultado = await _context.Doenca
                     .Include(x => x.Categoria)
-                    .ToList();
+                    .ToListAsync();
 
                 if (!resultado.Any())
                     return NoContent();
@@ -44,16 +47,19 @@ namespace Arkive_API.Controllers
         [HttpGet("ativos")]
         [SwaggerOperation(
             Summary = "Lista doenças ativas",
-            Description = "Retorna todas as doenças com status ativo."
+            Description = "Retorna todas as doenças com status ativo, incluindo a categoria clínica vinculada."
         )]
-        public IActionResult GetDoencasAtivas()
+        [SwaggerResponse(statusCode: 200, description: "Listagem de dados retornada com sucesso", type: typeof(IEnumerable<DoencaEntity>))]
+        [SwaggerResponse(statusCode: 204, description: "Nenhuma doença ativa encontrada")]
+        [SwaggerResponse(statusCode: 400, description: "Ocorreu um erro ao retornar os dados", type: typeof(string))]
+        public async Task<IActionResult> GetDoencasAtivas()
         {
             try
             {
-                var resultado = _context.Doenca
+                var resultado = await _context.Doenca
                     .Include(x => x.Categoria)
                     .Where(x => x.StAtivo == 'S')
-                    .ToList();
+                    .ToListAsync();
 
                 if (!resultado.Any())
                     return NoContent();
@@ -69,16 +75,19 @@ namespace Arkive_API.Controllers
         [HttpGet("inativos")]
         [SwaggerOperation(
             Summary = "Lista doenças inativas",
-            Description = "Retorna todas as doenças com status inativo (excluídas logicamente)."
+            Description = "Retorna todas as doenças com status inativo (excluídas logicamente), incluindo a categoria clínica vinculada."
         )]
-        public IActionResult GetDoencasInativas()
+        [SwaggerResponse(statusCode: 200, description: "Listagem de dados retornada com sucesso", type: typeof(IEnumerable<DoencaEntity>))]
+        [SwaggerResponse(statusCode: 204, description: "Nenhuma doença inativa encontrada")]
+        [SwaggerResponse(statusCode: 400, description: "Ocorreu um erro ao retornar os dados", type: typeof(string))]
+        public async Task<IActionResult> GetDoencasInativas()
         {
             try
             {
-                var resultado = _context.Doenca
+                var resultado = await _context.Doenca
                     .Include(x => x.Categoria)
                     .Where(x => x.StAtivo == 'N')
-                    .ToList();
+                    .ToListAsync();
 
                 if (!resultado.Any())
                     return NoContent();
@@ -94,15 +103,18 @@ namespace Arkive_API.Controllers
         [HttpGet("{id}")]
         [SwaggerOperation(
             Summary = "Busca doença por ID",
-            Description = "Retorna uma doença específica pelo seu ID, incluindo a categoria clínica vinculada."
+            Description = "Retorna uma doença específica pelo seu ID, independente do status, incluindo a categoria clínica vinculada."
         )]
-        public IActionResult GetDoencaById(int id)
+        [SwaggerResponse(statusCode: 200, description: "Doença retornada com sucesso", type: typeof(DoencaEntity))]
+        [SwaggerResponse(statusCode: 404, description: "Doença não encontrada")]
+        [SwaggerResponse(statusCode: 400, description: "Ocorreu um erro ao retornar os dados", type: typeof(string))]
+        public async Task<IActionResult> GetDoencaById(int id)
         {
             try
             {
-                var doenca = _context.Doenca
+                var doenca = await _context.Doenca
                     .Include(x => x.Categoria)
-                    .FirstOrDefault(x => x.Id == id);
+                    .FirstOrDefaultAsync(x => x.Id == id);
 
                 if (doenca is null)
                     return NotFound();
@@ -120,14 +132,17 @@ namespace Arkive_API.Controllers
             Summary = "Busca doenças por nome",
             Description = "Retorna todas as doenças ativas cujo nome contenha o termo informado (busca parcial)."
         )]
-        public IActionResult GetDoencaByNome(string nome)
+        [SwaggerResponse(statusCode: 200, description: "Listagem de dados retornada com sucesso", type: typeof(IEnumerable<DoencaEntity>))]
+        [SwaggerResponse(statusCode: 204, description: "Nenhuma doença encontrada com esse nome")]
+        [SwaggerResponse(statusCode: 400, description: "Ocorreu um erro ao retornar os dados", type: typeof(string))]
+        public async Task<IActionResult> GetDoencaByNome(string nome)
         {
             try
             {
-                var resultado = _context.Doenca
+                var resultado = await _context.Doenca
                     .Include(x => x.Categoria)
                     .Where(x => x.StAtivo == 'S' && x.Nome.ToLower().Contains(nome.ToLower()))
-                    .ToList();
+                    .ToListAsync();
 
                 if (!resultado.Any())
                     return NoContent();
@@ -145,14 +160,17 @@ namespace Arkive_API.Controllers
             Summary = "Lista doenças por categoria",
             Description = "Retorna todas as doenças ativas vinculadas a uma categoria clínica específica."
         )]
-        public IActionResult GetDoencaByCategoria(int idCategoria)
+        [SwaggerResponse(statusCode: 200, description: "Listagem de dados retornada com sucesso", type: typeof(IEnumerable<DoencaEntity>))]
+        [SwaggerResponse(statusCode: 204, description: "Nenhuma doença encontrada para esta categoria")]
+        [SwaggerResponse(statusCode: 400, description: "Ocorreu um erro ao retornar os dados", type: typeof(string))]
+        public async Task<IActionResult> GetDoencaByCategoria(int idCategoria)
         {
             try
             {
-                var resultado = _context.Doenca
+                var resultado = await _context.Doenca
                     .Include(x => x.Categoria)
                     .Where(x => x.StAtivo == 'S' && x.IdCategoria == idCategoria)
-                    .ToList();
+                    .ToListAsync();
 
                 if (!resultado.Any())
                     return NoContent();
@@ -168,16 +186,28 @@ namespace Arkive_API.Controllers
         [HttpPost]
         [SwaggerOperation(
             Summary = "Cria uma nova doença",
-            Description = "Cadastra uma nova doença no catálogo clínico."
+            Description = "Cadastra uma nova doença no catálogo clínico. A categoria é opcional."
         )]
-        public IActionResult CreateDoenca(DoencaEntity model)
+        [SwaggerResponse(statusCode: 201, description: "Doença criada com sucesso", type: typeof(DoencaEntity))]
+        [SwaggerResponse(statusCode: 404, description: "Categoria informada não encontrada ou inativa")]
+        [SwaggerResponse(statusCode: 400, description: "Ocorreu um erro ao criar a doença", type: typeof(string))]
+        public async Task<IActionResult> CreateDoenca(DoencaEntity model)
         {
             try
             {
+                if (model.IdCategoria is not null)
+                {
+                    var categoriaExiste = await _context.CategoriaDoenca
+                        .AnyAsync(x => x.Id == model.IdCategoria && x.StAtivo == 'S');
+
+                    if (!categoriaExiste)
+                        return NotFound($"Categoria com ID {model.IdCategoria} não encontrada.");
+                }
+
                 model.StAtivo = 'S';
 
                 _context.Doenca.Add(model);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
 
                 return CreatedAtAction(nameof(GetDoencaById), new { id = model.Id }, model);
             }
@@ -190,15 +220,18 @@ namespace Arkive_API.Controllers
         [HttpPut("{id}")]
         [SwaggerOperation(
             Summary = "Atualiza uma doença",
-            Description = "Atualiza os dados de uma doença existente no catálogo."
+            Description = "Atualiza os dados de uma doença ativa existente no catálogo."
         )]
-        public IActionResult DoencaUpdate(int id, DoencaEntity model)
+        [SwaggerResponse(statusCode: 200, description: "Doença atualizada com sucesso", type: typeof(DoencaEntity))]
+        [SwaggerResponse(statusCode: 404, description: "Doença não encontrada ou inativa")]
+        [SwaggerResponse(statusCode: 400, description: "Ocorreu um erro ao atualizar a doença", type: typeof(string))]
+        public async Task<IActionResult> DoencaUpdate(int id, DoencaEntity model)
         {
             try
             {
-                var doenca = _context.Doenca
+                var doenca = await _context.Doenca
                     .Where(x => x.StAtivo == 'S')
-                    .FirstOrDefault(x => x.Id == id);
+                    .FirstOrDefaultAsync(x => x.Id == id);
 
                 if (doenca is null)
                     return NotFound();
@@ -210,7 +243,7 @@ namespace Arkive_API.Controllers
                 doenca.Sintomas = model.Sintomas;
 
                 _context.Doenca.Update(doenca);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
 
                 return Ok(doenca);
             }
@@ -225,13 +258,16 @@ namespace Arkive_API.Controllers
             Summary = "Reativa uma doença",
             Description = "Restaura uma doença previamente inativada."
         )]
-        public IActionResult DoencaReativar(int id)
+        [SwaggerResponse(statusCode: 200, description: "Doença reativada com sucesso", type: typeof(DoencaEntity))]
+        [SwaggerResponse(statusCode: 404, description: "Doença não encontrada ou já está ativa")]
+        [SwaggerResponse(statusCode: 400, description: "Ocorreu um erro ao reativar a doença", type: typeof(string))]
+        public async Task<IActionResult> DoencaReativar(int id)
         {
             try
             {
-                var doenca = _context.Doenca
+                var doenca = await _context.Doenca
                     .Where(x => x.StAtivo == 'N')
-                    .FirstOrDefault(x => x.Id == id);
+                    .FirstOrDefaultAsync(x => x.Id == id);
 
                 if (doenca is null)
                     return NotFound();
@@ -239,7 +275,7 @@ namespace Arkive_API.Controllers
                 doenca.StAtivo = 'S';
 
                 _context.Doenca.Update(doenca);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
 
                 return Ok(doenca);
             }
@@ -254,13 +290,16 @@ namespace Arkive_API.Controllers
             Summary = "Inativa uma doença",
             Description = "Realiza a exclusão lógica de uma doença (soft delete)."
         )]
-        public IActionResult DoencaDelete(int id)
+        [SwaggerResponse(statusCode: 200, description: "Doença inativada com sucesso", type: typeof(DoencaEntity))]
+        [SwaggerResponse(statusCode: 404, description: "Doença não encontrada ou já está inativa")]
+        [SwaggerResponse(statusCode: 400, description: "Ocorreu um erro ao inativar a doença", type: typeof(string))]
+        public async Task<IActionResult> DoencaDelete(int id)
         {
             try
             {
-                var doenca = _context.Doenca
+                var doenca = await _context.Doenca
                     .Where(x => x.StAtivo == 'S')
-                    .FirstOrDefault(x => x.Id == id);
+                    .FirstOrDefaultAsync(x => x.Id == id);
 
                 if (doenca is null)
                     return NotFound();
@@ -268,7 +307,7 @@ namespace Arkive_API.Controllers
                 doenca.StAtivo = 'N';
 
                 _context.Doenca.Update(doenca);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
 
                 return Ok(doenca);
             }

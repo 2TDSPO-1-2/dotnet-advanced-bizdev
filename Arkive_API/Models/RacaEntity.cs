@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Xml.Linq;
+using System.Text.Json.Serialization;
 
 namespace Arkive_API.Models
 {
@@ -33,5 +33,8 @@ namespace Arkive_API.Models
         [Column("ST_ATIVO")]
         [Required]
         public char StAtivo { get; set; } = 'S';
+
+        [JsonIgnore]
+        public ICollection<PredisposicaoEntity>? Predisposicoes { get; set; }
     }
 }

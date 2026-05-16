@@ -1,6 +1,7 @@
 ﻿using Arkive_API.Data;
 using Arkive_API.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace Arkive_API.Controllers
@@ -21,11 +22,14 @@ namespace Arkive_API.Controllers
             Summary = "Lista todas as categorias de doença",
             Description = "Retorna todas as categorias clínicas cadastradas no sistema."
         )]
-        public IActionResult GetAllCategorias()
+        [SwaggerResponse(statusCode: 200, description: "Listagem de dados retornada com sucesso", type: typeof(IEnumerable<CategoriaDoencaEntity>))]
+        [SwaggerResponse(statusCode: 204, description: "Nenhuma categoria encontrada")]
+        [SwaggerResponse(statusCode: 400, description: "Ocorreu um erro ao retornar os dados", type: typeof(string))]
+        public async Task<IActionResult> GetAllCategorias()
         {
             try
             {
-                var resultado = _context.CategoriaDoenca.ToList();
+                var resultado = await _context.CategoriaDoenca.ToListAsync();
 
                 if (!resultado.Any())
                     return NoContent();
@@ -43,13 +47,16 @@ namespace Arkive_API.Controllers
             Summary = "Lista categorias de doença ativas",
             Description = "Retorna todas as categorias clínicas com status ativo."
         )]
-        public IActionResult GetCategoriasAtivas()
+        [SwaggerResponse(statusCode: 200, description: "Listagem de dados retornada com sucesso", type: typeof(IEnumerable<CategoriaDoencaEntity>))]
+        [SwaggerResponse(statusCode: 204, description: "Nenhuma categoria ativa encontrada")]
+        [SwaggerResponse(statusCode: 400, description: "Ocorreu um erro ao retornar os dados", type: typeof(string))]
+        public async Task<IActionResult> GetCategoriasAtivas()
         {
             try
             {
-                var resultado = _context.CategoriaDoenca
+                var resultado = await _context.CategoriaDoenca
                     .Where(x => x.StAtivo == 'S')
-                    .ToList();
+                    .ToListAsync();
 
                 if (!resultado.Any())
                     return NoContent();
@@ -67,13 +74,16 @@ namespace Arkive_API.Controllers
             Summary = "Lista categorias de doença inativas",
             Description = "Retorna todas as categorias clínicas com status inativo (excluídas logicamente)."
         )]
-        public IActionResult GetCategoriasInativas()
+        [SwaggerResponse(statusCode: 200, description: "Listagem de dados retornada com sucesso", type: typeof(IEnumerable<CategoriaDoencaEntity>))]
+        [SwaggerResponse(statusCode: 204, description: "Nenhuma categoria inativa encontrada")]
+        [SwaggerResponse(statusCode: 400, description: "Ocorreu um erro ao retornar os dados", type: typeof(string))]
+        public async Task<IActionResult> GetCategoriasInativas()
         {
             try
             {
-                var resultado = _context.CategoriaDoenca
+                var resultado = await _context.CategoriaDoenca
                     .Where(x => x.StAtivo == 'N')
-                    .ToList();
+                    .ToListAsync();
 
                 if (!resultado.Any())
                     return NoContent();
@@ -89,14 +99,17 @@ namespace Arkive_API.Controllers
         [HttpGet("{id}")]
         [SwaggerOperation(
             Summary = "Busca categoria de doença por ID",
-            Description = "Retorna uma categoria clínica específica pelo seu ID."
+            Description = "Retorna uma categoria clínica específica pelo seu ID, independente do status."
         )]
-        public IActionResult GetCategoriaById(int id)
+        [SwaggerResponse(statusCode: 200, description: "Categoria retornada com sucesso", type: typeof(CategoriaDoencaEntity))]
+        [SwaggerResponse(statusCode: 404, description: "Categoria não encontrada")]
+        [SwaggerResponse(statusCode: 400, description: "Ocorreu um erro ao retornar os dados", type: typeof(string))]
+        public async Task<IActionResult> GetCategoriaById(int id)
         {
             try
             {
-                var categoria = _context.CategoriaDoenca
-                    .FirstOrDefault(x => x.Id == id);
+                var categoria = await _context.CategoriaDoenca
+                    .FirstOrDefaultAsync(x => x.Id == id);
 
                 if (categoria is null)
                     return NotFound();
@@ -114,14 +127,16 @@ namespace Arkive_API.Controllers
             Summary = "Cria uma nova categoria de doença",
             Description = "Cadastra uma nova categoria clínica no sistema."
         )]
-        public IActionResult CreateCategoria(CategoriaDoencaEntity model)
+        [SwaggerResponse(statusCode: 201, description: "Categoria criada com sucesso", type: typeof(CategoriaDoencaEntity))]
+        [SwaggerResponse(statusCode: 400, description: "Ocorreu um erro ao criar a categoria", type: typeof(string))]
+        public async Task<IActionResult> CreateCategoria(CategoriaDoencaEntity model)
         {
             try
             {
                 model.StAtivo = 'S';
 
                 _context.CategoriaDoenca.Add(model);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
 
                 return CreatedAtAction(nameof(GetCategoriaById), new { id = model.Id }, model);
             }
@@ -134,15 +149,18 @@ namespace Arkive_API.Controllers
         [HttpPut("{id}")]
         [SwaggerOperation(
             Summary = "Atualiza uma categoria de doença",
-            Description = "Atualiza os dados de uma categoria clínica existente."
+            Description = "Atualiza os dados de uma categoria clínica ativa existente."
         )]
-        public IActionResult CategoriaUpdate(int id, CategoriaDoencaEntity model)
+        [SwaggerResponse(statusCode: 200, description: "Categoria atualizada com sucesso", type: typeof(CategoriaDoencaEntity))]
+        [SwaggerResponse(statusCode: 404, description: "Categoria não encontrada ou inativa")]
+        [SwaggerResponse(statusCode: 400, description: "Ocorreu um erro ao atualizar a categoria", type: typeof(string))]
+        public async Task<IActionResult> CategoriaUpdate(int id, CategoriaDoencaEntity model)
         {
             try
             {
-                var categoria = _context.CategoriaDoenca
+                var categoria = await _context.CategoriaDoenca
                     .Where(x => x.StAtivo == 'S')
-                    .FirstOrDefault(x => x.Id == id);
+                    .FirstOrDefaultAsync(x => x.Id == id);
 
                 if (categoria is null)
                     return NotFound();
@@ -150,7 +168,7 @@ namespace Arkive_API.Controllers
                 categoria.Nome = model.Nome;
 
                 _context.CategoriaDoenca.Update(categoria);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
 
                 return Ok(categoria);
             }
@@ -165,13 +183,16 @@ namespace Arkive_API.Controllers
             Summary = "Reativa uma categoria de doença",
             Description = "Restaura uma categoria clínica previamente inativada."
         )]
-        public IActionResult CategoriaReativar(int id)
+        [SwaggerResponse(statusCode: 200, description: "Categoria reativada com sucesso", type: typeof(CategoriaDoencaEntity))]
+        [SwaggerResponse(statusCode: 404, description: "Categoria não encontrada ou já está ativa")]
+        [SwaggerResponse(statusCode: 400, description: "Ocorreu um erro ao reativar a categoria", type: typeof(string))]
+        public async Task<IActionResult> CategoriaReativar(int id)
         {
             try
             {
-                var categoria = _context.CategoriaDoenca
+                var categoria = await _context.CategoriaDoenca
                     .Where(x => x.StAtivo == 'N')
-                    .FirstOrDefault(x => x.Id == id);
+                    .FirstOrDefaultAsync(x => x.Id == id);
 
                 if (categoria is null)
                     return NotFound();
@@ -179,7 +200,7 @@ namespace Arkive_API.Controllers
                 categoria.StAtivo = 'S';
 
                 _context.CategoriaDoenca.Update(categoria);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
 
                 return Ok(categoria);
             }
@@ -194,13 +215,16 @@ namespace Arkive_API.Controllers
             Summary = "Inativa uma categoria de doença",
             Description = "Realiza a exclusão lógica de uma categoria clínica (soft delete)."
         )]
-        public IActionResult CategoriaDelete(int id)
+        [SwaggerResponse(statusCode: 200, description: "Categoria inativada com sucesso", type: typeof(CategoriaDoencaEntity))]
+        [SwaggerResponse(statusCode: 404, description: "Categoria não encontrada ou já está inativa")]
+        [SwaggerResponse(statusCode: 400, description: "Ocorreu um erro ao inativar a categoria", type: typeof(string))]
+        public async Task<IActionResult> CategoriaDelete(int id)
         {
             try
             {
-                var categoria = _context.CategoriaDoenca
+                var categoria = await _context.CategoriaDoenca
                     .Where(x => x.StAtivo == 'S')
-                    .FirstOrDefault(x => x.Id == id);
+                    .FirstOrDefaultAsync(x => x.Id == id);
 
                 if (categoria is null)
                     return NotFound();
@@ -208,7 +232,7 @@ namespace Arkive_API.Controllers
                 categoria.StAtivo = 'N';
 
                 _context.CategoriaDoenca.Update(categoria);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
 
                 return Ok(categoria);
             }

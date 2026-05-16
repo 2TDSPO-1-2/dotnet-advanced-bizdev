@@ -1,6 +1,7 @@
 ﻿using Arkive_API.Data;
 using Arkive_API.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace Arkive_API.Controllers
@@ -21,11 +22,14 @@ namespace Arkive_API.Controllers
             Summary = "Lista todas as espécies",
             Description = "Retorna todas as espécies cadastradas no sistema."
         )]
-        public IActionResult GetAllEspecies()
+        [SwaggerResponse(statusCode: 200, description: "Listagem de dados retornada com sucesso", type: typeof(IEnumerable<EspecieEntity>))]
+        [SwaggerResponse(statusCode: 204, description: "Nenhuma espécie encontrada")]
+        [SwaggerResponse(statusCode: 400, description: "Ocorreu um erro ao retornar os dados", type: typeof(string))]
+        public async Task<IActionResult> GetAllEspecies()
         {
             try
             {
-                var resultado = _context.Especie.ToList();
+                var resultado = await _context.Especie.ToListAsync();
 
                 if (!resultado.Any())
                     return NoContent();
@@ -43,13 +47,16 @@ namespace Arkive_API.Controllers
             Summary = "Lista espécies ativas",
             Description = "Retorna todas as espécies com status ativo."
         )]
-        public IActionResult GetEspeciesAtivas()
+        [SwaggerResponse(statusCode: 200, description: "Listagem de dados retornada com sucesso", type: typeof(IEnumerable<EspecieEntity>))]
+        [SwaggerResponse(statusCode: 204, description: "Nenhuma espécie ativa encontrada")]
+        [SwaggerResponse(statusCode: 400, description: "Ocorreu um erro ao retornar os dados", type: typeof(string))]
+        public async Task<IActionResult> GetEspeciesAtivas()
         {
             try
             {
-                var resultado = _context.Especie
+                var resultado = await _context.Especie
                     .Where(x => x.StAtivo == 'S')
-                    .ToList();
+                    .ToListAsync();
 
                 if (!resultado.Any())
                     return NoContent();
@@ -67,13 +74,16 @@ namespace Arkive_API.Controllers
             Summary = "Lista espécies inativas",
             Description = "Retorna todas as espécies com status inativo (excluídas logicamente)."
         )]
-        public IActionResult GetEspeciesInativas()
+        [SwaggerResponse(statusCode: 200, description: "Listagem de dados retornada com sucesso", type: typeof(IEnumerable<EspecieEntity>))]
+        [SwaggerResponse(statusCode: 204, description: "Nenhuma espécie inativa encontrada")]
+        [SwaggerResponse(statusCode: 400, description: "Ocorreu um erro ao retornar os dados", type: typeof(string))]
+        public async Task<IActionResult> GetEspeciesInativas()
         {
             try
             {
-                var resultado = _context.Especie
+                var resultado = await _context.Especie
                     .Where(x => x.StAtivo == 'N')
-                    .ToList();
+                    .ToListAsync();
 
                 if (!resultado.Any())
                     return NoContent();
@@ -89,14 +99,17 @@ namespace Arkive_API.Controllers
         [HttpGet("{id}")]
         [SwaggerOperation(
             Summary = "Busca espécie por ID",
-            Description = "Retorna uma espécie específica pelo seu ID."
+            Description = "Retorna uma espécie específica pelo seu ID, independente do status."
         )]
-        public IActionResult GetEspecieById(int id)
+        [SwaggerResponse(statusCode: 200, description: "Espécie retornada com sucesso", type: typeof(EspecieEntity))]
+        [SwaggerResponse(statusCode: 404, description: "Espécie não encontrada")]
+        [SwaggerResponse(statusCode: 400, description: "Ocorreu um erro ao retornar os dados", type: typeof(string))]
+        public async Task<IActionResult> GetEspecieById(int id)
         {
             try
             {
-                var especie = _context.Especie
-                    .FirstOrDefault(x => x.Id == id);
+                var especie = await _context.Especie
+                    .FirstOrDefaultAsync(x => x.Id == id);
 
                 if (especie is null)
                     return NotFound();
@@ -114,14 +127,16 @@ namespace Arkive_API.Controllers
             Summary = "Cria uma nova espécie",
             Description = "Cadastra uma nova espécie no sistema."
         )]
-        public IActionResult CreateEspecie(EspecieEntity model)
+        [SwaggerResponse(statusCode: 201, description: "Espécie criada com sucesso", type: typeof(EspecieEntity))]
+        [SwaggerResponse(statusCode: 400, description: "Ocorreu um erro ao criar a espécie", type: typeof(string))]
+        public async Task<IActionResult> CreateEspecie(EspecieEntity model)
         {
             try
             {
                 model.StAtivo = 'S';
 
                 _context.Especie.Add(model);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
 
                 return CreatedAtAction(nameof(GetEspecieById), new { id = model.Id }, model);
             }
@@ -134,15 +149,18 @@ namespace Arkive_API.Controllers
         [HttpPut("{id}")]
         [SwaggerOperation(
             Summary = "Atualiza uma espécie",
-            Description = "Atualiza os dados de uma espécie existente."
+            Description = "Atualiza os dados de uma espécie ativa existente."
         )]
-        public IActionResult EspecieUpdate(int id, EspecieEntity model)
+        [SwaggerResponse(statusCode: 200, description: "Espécie atualizada com sucesso", type: typeof(EspecieEntity))]
+        [SwaggerResponse(statusCode: 404, description: "Espécie não encontrada ou inativa")]
+        [SwaggerResponse(statusCode: 400, description: "Ocorreu um erro ao atualizar a espécie", type: typeof(string))]
+        public async Task<IActionResult> EspecieUpdate(int id, EspecieEntity model)
         {
             try
             {
-                var especie = _context.Especie
+                var especie = await _context.Especie
                     .Where(x => x.StAtivo == 'S')
-                    .FirstOrDefault(x => x.Id == id);
+                    .FirstOrDefaultAsync(x => x.Id == id);
 
                 if (especie is null)
                     return NotFound();
@@ -150,7 +168,7 @@ namespace Arkive_API.Controllers
                 especie.Especie = model.Especie;
 
                 _context.Especie.Update(especie);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
 
                 return Ok(especie);
             }
@@ -165,13 +183,16 @@ namespace Arkive_API.Controllers
             Summary = "Reativa uma espécie",
             Description = "Restaura uma espécie previamente inativada."
         )]
-        public IActionResult EspecieReativar(int id)
+        [SwaggerResponse(statusCode: 200, description: "Espécie reativada com sucesso", type: typeof(EspecieEntity))]
+        [SwaggerResponse(statusCode: 404, description: "Espécie não encontrada ou já está ativa")]
+        [SwaggerResponse(statusCode: 400, description: "Ocorreu um erro ao reativar a espécie", type: typeof(string))]
+        public async Task<IActionResult> EspecieReativar(int id)
         {
             try
             {
-                var especie = _context.Especie
+                var especie = await _context.Especie
                     .Where(x => x.StAtivo == 'N')
-                    .FirstOrDefault(x => x.Id == id);
+                    .FirstOrDefaultAsync(x => x.Id == id);
 
                 if (especie is null)
                     return NotFound();
@@ -179,7 +200,7 @@ namespace Arkive_API.Controllers
                 especie.StAtivo = 'S';
 
                 _context.Especie.Update(especie);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
 
                 return Ok(especie);
             }
@@ -194,13 +215,16 @@ namespace Arkive_API.Controllers
             Summary = "Inativa uma espécie",
             Description = "Realiza a exclusão lógica de uma espécie (soft delete)."
         )]
-        public IActionResult EspecieDelete(int id)
+        [SwaggerResponse(statusCode: 200, description: "Espécie inativada com sucesso", type: typeof(EspecieEntity))]
+        [SwaggerResponse(statusCode: 404, description: "Espécie não encontrada ou já está inativa")]
+        [SwaggerResponse(statusCode: 400, description: "Ocorreu um erro ao inativar a espécie", type: typeof(string))]
+        public async Task<IActionResult> EspecieDelete(int id)
         {
             try
             {
-                var especie = _context.Especie
+                var especie = await _context.Especie
                     .Where(x => x.StAtivo == 'S')
-                    .FirstOrDefault(x => x.Id == id);
+                    .FirstOrDefaultAsync(x => x.Id == id);
 
                 if (especie is null)
                     return NotFound();
@@ -208,7 +232,7 @@ namespace Arkive_API.Controllers
                 especie.StAtivo = 'N';
 
                 _context.Especie.Update(especie);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
 
                 return Ok(especie);
             }

@@ -57,15 +57,7 @@ cd dotnet-advanced-bizdev
 
 ### 2. Configure a string de conexão
 
-Edite o arquivo `Arkive_API/appsettings.json` com as credenciais do banco Oracle:
-
-```json
-{
-  "ConnectionStrings": {
-    "Oracle": "User Id=<usuario>;Password=<senha>;Data Source=<host>:<porta>/<service>"
-  }
-}
-```
+Devido à necessidade de acesso às tabelas criadas previamente pela equipe no banco Oracle compartilhado, as credenciais já estão configuradas no `Arkive_API/appsettings.json` do repositório. Basta clonar e executar — nenhuma alteração é necessária.
 
 ### 3. Migrations
 
